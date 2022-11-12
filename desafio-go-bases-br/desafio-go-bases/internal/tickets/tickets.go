@@ -53,11 +53,6 @@ var ErrTimeFormat = errors.New(`insira um formato de horário válido.
 
 // GetTotalTickets Busca total de tickets de um determinado país em um dia
 func (c CiaAerea) GetTotalTickets(destination string) (int, error) {
-	// deve retornar quantas pessoas vão para o destino
-	//tiketsList, err := c.CarregarTickets24Horas()
-	//if err != nil {
-	//	return 0, err
-	//}
 	contador := 0
 	for _, ticket := range c.Tickets24Horas {
 		if strings.ToUpper(ticket.PaisDeDestino) == strings.ToUpper(destination) {
@@ -71,15 +66,21 @@ func (c CiaAerea) GetTotalTickets(destination string) (int, error) {
 func (c CiaAerea) GetMornings(time string) (int, error) {
 	var turno string
 
-	// identificar e validar parâmetro recebido "time"
+	// identificar formato e validar parâmetro recebido: "time"
 	if time != Madrugada.String() && time != Manha.String() && time != Tarde.String() && time != Noite.String() && time != Madrugada.Num() && time != Manha.Num() && time != Tarde.Num() && time != Noite.Num() {
 		if strings.Contains(time, ":") {
 			partes := strings.SplitN(time, ":", 2)
-			horas, err := strconv.Atoi(partes[0])
+			var horas, minutos int
+			var err error
+			horas, err = strconv.Atoi(partes[0])
 			if err != nil {
 				return 0, err
 			}
-			if horas < 0 || horas > 23 {
+			minutos, err = strconv.Atoi(partes[1])
+			if err != nil {
+				return 0, err
+			}
+			if horas < 0 || horas > 23 || minutos > 59 {
 				return 0, ErrTimeFormat
 			}
 			if horas >= 0 && horas <= 6 {
@@ -118,7 +119,7 @@ func (c CiaAerea) GetMornings(time string) (int, error) {
 }
 
 // AverageDestination Calcula média de ticktes para um determinado país em um dia
-func (c CiaAerea) AverageDestination(destination string, totalDeTickets int) (float64, error) {
+func (c CiaAerea) AverageDestination(totalDeTickets int) (float64, error) {
 	// total viagens/total de paises
 	totalDePaises, err := c.BuscarTotalDeDestinos()
 	if err != nil {
