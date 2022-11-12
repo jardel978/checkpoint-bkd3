@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -45,11 +46,11 @@ func (c CiaAerea) BuscarTotalDeDestinos() (int, error) {
 
 var ErrTimeFormat = errors.New(`insira um formato de horário válido.
 	São aceitos os valores para:
-		Madrugada: "madrugada", 1, 00:00 a 06:00
-		Manhã: "manha", 2, 07:00 a 12:00
-		Tarde: "tarde", 3, 13:00 a 19:00
-		Noite: "noite", 4, 20:00 a 23:00
-	Ex: 14:00 ou tarde ou 3`)
+		Madrugada: "madrugada", 0, 00:00 a 06:00
+		Manhã: "manha", 1, 07:00 a 12:00
+		Tarde: "tarde", 2, 13:00 a 19:00
+		Noite: "noite", 3, 20:00 a 23:00
+	Ex: 14:00 ou tarde ou 2`)
 
 // GetTotalTickets Busca total de tickets de um determinado país em um dia
 func (c CiaAerea) GetTotalTickets(destination string) (int, error) {
@@ -69,6 +70,11 @@ func (c CiaAerea) GetMornings(time string) (int, error) {
 	// identificar formato e validar parâmetro recebido: "time"
 	if time != Madrugada.String() && time != Manha.String() && time != Tarde.String() && time != Noite.String() && time != Madrugada.Num() && time != Manha.Num() && time != Tarde.Num() && time != Noite.Num() {
 		if strings.Contains(time, ":") {
+			formato := regexp.MustCompile(`\d\d:\d\d`)
+			match := formato.MatchString(time)
+			if !match {
+				return 0, ErrTimeFormat
+			}
 			partes := strings.SplitN(time, ":", 2)
 			var horas, minutos int
 			var err error
@@ -80,6 +86,7 @@ func (c CiaAerea) GetMornings(time string) (int, error) {
 			if err != nil {
 				return 0, err
 			}
+
 			if horas < 0 || horas > 23 || minutos > 59 {
 				return 0, ErrTimeFormat
 			}
@@ -92,6 +99,15 @@ func (c CiaAerea) GetMornings(time string) (int, error) {
 			} else {
 				turno = "noite"
 			}
+		} else {
+			num, err := strconv.ParseInt(time, 10, 0)
+			if err != nil {
+				return 0, err
+			}
+			if num > 3 {
+				return 0, ErrTimeFormat
+			}
+			turno = time
 		}
 	} else {
 		turno = time
@@ -154,9 +170,8 @@ func (t turno) Num() string {
 		return "2"
 	case Noite:
 		return "3"
-	default:
-		return ""
 	}
+	return ""
 }
 
 func Contains(s []string, e string) bool {

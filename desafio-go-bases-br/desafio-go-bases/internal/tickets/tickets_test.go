@@ -1,7 +1,6 @@
 package tickets
 
 import (
-	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"os"
@@ -222,7 +221,7 @@ type TesteCiaAereaError struct {
 	esperado error
 }
 
-func TestCiaAerea_GetMornings(t *testing.T) {
+func TestCiaAerea_GetMorningsPositivo(t *testing.T) {
 
 	ticketsList, err := OpenCSV("C:\\Users\\jarde\\Documents\\curso_ctd\\ctd-ano2-jardel-silva\\bim3\\especializacao-backed03\\checkpoint01\\desafio-go-bases-br\\desafio-go-bases\\tickets.csv")
 	if err != nil {
@@ -256,7 +255,7 @@ func TestCiaAerea_GetMornings(t *testing.T) {
 	}
 }
 
-func TestCiaAerea_GetMornings2(t *testing.T) {
+func TestCiaAerea_GetMorningsNegativo(t *testing.T) {
 	ticketsList, err := OpenCSV("C:\\Users\\jarde\\Documents\\curso_ctd\\ctd-ano2-jardel-silva\\bim3\\especializacao-backed03\\checkpoint01\\desafio-go-bases-br\\desafio-go-bases\\tickets.csv")
 	if err != nil {
 		fmt.Println(err)
@@ -266,11 +265,17 @@ func TestCiaAerea_GetMornings2(t *testing.T) {
 	testes := []TesteCiaAereaError{
 		{data: "00:60", esperado: ErrTimeFormat},
 		{data: "24:00", esperado: ErrTimeFormat},
+		{data: "6:", esperado: ErrTimeFormat},
+		{data: "23:", esperado: ErrTimeFormat},
+		{data: ":4", esperado: ErrTimeFormat},
+		{data: "4", esperado: ErrTimeFormat},
+		{data: "shdh:", esperado: ErrTimeFormat},
+		{data: "shd", esperado: ErrTimeFormat},
 	}
 
 	for _, teste := range testes {
 		resultado, err := ciaAerea.GetMornings(teste.data)
-		if err == nil || !errors.Is(err, ErrTimeFormat) {
+		if err == nil {
 			t.Error("("+teste.data+") - "+"Expected:", teste.esperado, "Got:", resultado)
 		}
 	}
