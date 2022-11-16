@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/bootcamp-go/desafio-go-bases/internal/tickets"
 	"github.com/google/uuid"
+	"github.com/jardel197/checkpoint-bkd3/desafio-go-bases-br/desafio-go-bases/internal/tickets"
 )
 
 var CiaAerea tickets.CiaAerea
@@ -61,5 +61,5 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Printf("Média de tickets para o Brasil em um dia dentre um total de %v: %v\n", len(CiaAerea.Tickets24Horas), mediaTicketsPorDestino)
+	fmt.Printf("Média de tickets por destinos em um dia: %v\n", mediaTicketsPorDestino)
 }

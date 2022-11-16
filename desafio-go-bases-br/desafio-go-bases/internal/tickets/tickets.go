@@ -134,7 +134,7 @@ func (c CiaAerea) GetMornings(time string) (int, error) {
 	return contador, nil
 }
 
-// AverageDestination Calcula média de ticktes para um determinado país em um dia
+// AverageDestination Calcula média de ticktes por destinos em um dia
 func (c CiaAerea) AverageDestination(totalDeTickets int) (float64, error) {
 	// total viagens/total de paises
 	totalDePaises, err := c.BuscarTotalDeDestinos()
